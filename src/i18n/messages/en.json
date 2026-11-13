@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "title": "Frontend Engine",
+    "description": "Starting point for SaaS frontends."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members"
+  },
+  "common": {
+    "cancel": "Cancel"
+  },
+  "theme": {
+    "toggle": "Change theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "label": "Language",
+    "en": "English"
+  },
+  "errors": {
+    "pageTitle": "Something went wrong",
+    "network": "Could not reach the server",
+    "forbidden": "You do not have access to this",
+    "notFound": "This could not be found",
+    "server": "The server ran into a problem",
+    "unexpected": "Something went wrong",
+    "tryAgainHint": "Please try again in a moment.",
+    "retry": "Try again"
+  },
+  "validation": {
+    "required": "This field is required",
+    "nameTooShort": "Name must be at least 2 characters",
+    "nameTooLong": "Name must be at most 100 characters",
+    "emailInvalid": "Enter a valid email address",
+    "emailTaken": "This email is already a member"
+  },
+  "table": {
+    "empty": "No results.",
+    "total": "{count, plural, =0 {No items} one {# item} other {# items}}",
+    "rowsPerPage": "Rows per page",
+    "page": "Page {page} of {pageCount}",
+    "previous": "Previous page",
+    "next": "Next page"
+  },
+  "home": {
+    "title": "Build your next SaaS frontend",
+    "description": "A tested starting point with routing, data fetching, forms, translations and quality gates in place.",
+    "cta": "Open the app"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Overview of your workspace.",
+    "membersCardTitle": "Members",
+    "membersCardDescription": "Reference feature: table, filters, forms and dialogs on mocked data.",
+    "nextStepsTitle": "Next steps",
+    "nextStepsDescription": "Connect a backend in src/shared/lib/http and build the first feature from the members pattern."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or was moved.",
+    "backHome": "Back to home"
+  },
+  "members": {
+    "title": "Members",
+    "description": "Manage who has access to your workspace.",
+    "invite": "Invite member",
+    "searchPlaceholder": "Search by name or email",
+    "filterByRole": "Filter by role",
+    "allRoles": "All roles",
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member"
+    },
+    "statuses": {
+      "active": "Active",
+      "invited": "Invited"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "createdAt": "Joined",
+      "actions": "Actions"
+    },
+    "actionsFor": "Actions for {name}",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleted": "{name} was removed",
+    "deleteFailed": "Could not remove the member",
+    "deleteTitle": "Remove member?",
+    "deleteDescription": "{name} will lose access to this workspace.",
+    "emptyTitle": "No members yet",
+    "emptyDescription": "Invite your first team member to get started.",
+    "emptyFilteredTitle": "No matching members",
+    "emptyFilteredDescription": "Try a different search or role filter.",
+    "form": {
+      "createTitle": "Invite member",
+      "createDescription": "They will receive an invitation by email.",
+      "editTitle": "Edit member",
+      "editDescription": "Update the member's details and role.",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "cancel": "Cancel",
+      "create": "Send invite",
+      "save": "Save changes",
+      "created": "Invitation sent",
+      "updated": "Member updated",
+      "saveFailed": "Could not save the member"
+    }
+  }
+}

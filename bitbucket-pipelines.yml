@@ -1,0 +1,37 @@
+# Bitbucket Pipelines. Delete this file if the project uses GitHub (see .github/workflows/ci.yml).
+image: node:22
+
+definitions:
+  caches:
+    pnpm: $HOME/.local/share/pnpm/store
+  steps:
+    - step: &verify
+        name: Verify
+        caches: [pnpm]
+        script:
+          - corepack enable
+          - pnpm install --frozen-lockfile
+          - pnpm verify
+          - if [ -f scripts/check-engine.mjs ]; then pnpm engine:check; fi
+    - step: &e2e
+        name: End-to-end tests
+        image: mcr.microsoft.com/playwright:v1.65.0-noble
+        caches: [pnpm]
+        script:
+          - corepack enable
+          - pnpm install --frozen-lockfile
+          - CI=true pnpm e2e
+        artifacts:
+          - playwright-report/**
+
+pipelines:
+  pull-requests:
+    '**':
+      - parallel:
+          - step: *verify
+          - step: *e2e
+  branches:
+    main:
+      - parallel:
+          - step: *verify
+          - step: *e2e
