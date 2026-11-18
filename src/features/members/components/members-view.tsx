@@ -14,38 +14,33 @@ import { Button } from '@/shared/ui/button';
 
 import { useDeleteMember, useMembersList } from '../api/members.queries';
 import { useMembersSearchParams } from '../hooks/use-members-search-params';
-import type { Member, MemberRole } from '../types/member';
-import { MemberFormDialog } from './member-form-dialog';
+import { MEMBER_SORT_FIELDS, type Member } from '../types/member';
+import { MemberInviteDialog } from './member-invite-dialog';
 import { useMembersColumns } from './members-columns';
-import { MembersToolbar } from './members-toolbar';
+import { MembersToolbar, type MembersFilters } from './members-toolbar';
 
 export function MembersView() {
   const t = useTranslations('members');
   const [params, setParams] = useMembersSearchParams();
-  const [formState, setFormState] = useState<{ open: boolean; member: Member | null }>({
-    open: false,
-    member: null,
-  });
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
 
   const membersQuery = useMembersList(params);
   const deleteMember = useDeleteMember();
 
-  const columns = useMembersColumns({
-    onEdit: (member) => {
-      setFormState({ open: true, member });
-    },
-    onDelete: setMemberToDelete,
-  });
+  const columns = useMembersColumns({ onDelete: setMemberToDelete });
 
-  const onSearchChange = useCallback(
-    (search: string) => void setParams({ search: search || null, page: 1 }),
+  // Any filter change starts again from the first page. Empty values are removed from the URL.
+  const onFiltersChange = useCallback(
+    (changes: Partial<MembersFilters>) =>
+      void setParams({
+        ...changes,
+        ...(changes.search === '' ? { search: null } : {}),
+        ...('status' in changes && changes.status?.length === 0 ? { status: null } : {}),
+        page: 1,
+      }),
     [setParams],
   );
-
-  function onRoleChange(role: MemberRole | null) {
-    void setParams({ role, page: 1 });
-  }
 
   async function confirmDelete() {
     if (!memberToDelete) return;
@@ -58,7 +53,12 @@ export function MembersView() {
     }
   }
 
-  const hasFilters = Boolean(params.search || params.role);
+  const hasFilters =
+    params.search !== '' ||
+    params.role !== null ||
+    params.status.length > 0 ||
+    params.joinedFrom !== null ||
+    params.joinedTo !== null;
 
   return (
     <>
@@ -66,18 +66,17 @@ export function MembersView() {
         title={t('title')}
         description={t('description')}
         actions={
-          <Button onClick={() => setFormState({ open: true, member: null })}>
+          <Button
+            onClick={() => {
+              setIsInviteOpen(true);
+            }}
+          >
             <PlusIcon /> {t('invite')}
           </Button>
         }
       />
 
-      <MembersToolbar
-        search={params.search}
-        role={params.role}
-        onSearchChange={onSearchChange}
-        onRoleChange={onRoleChange}
-      />
+      <MembersToolbar filters={params} onFiltersChange={onFiltersChange} />
 
       {membersQuery.isError ? (
         <ErrorState error={membersQuery.error} onRetry={() => void membersQuery.refetch()} />
@@ -95,11 +94,9 @@ export function MembersView() {
           sorting={[{ id: params.sort, desc: params.order === 'desc' }]}
           onSortingChange={(sorting) => {
             const [first] = sorting;
-            if (
-              first &&
-              (first.id === 'name' || first.id === 'email' || first.id === 'createdAt')
-            ) {
-              void setParams({ sort: first.id, order: first.desc ? 'desc' : 'asc', page: 1 });
+            const sort = MEMBER_SORT_FIELDS.find((field) => field === first?.id);
+            if (first && sort) {
+              void setParams({ sort, order: first.desc ? 'desc' : 'asc', page: 1 });
             }
           }}
           emptyState={
@@ -112,13 +109,7 @@ export function MembersView() {
         />
       )}
 
-      <MemberFormDialog
-        open={formState.open}
-        member={formState.member}
-        onOpenChange={(open) => {
-          setFormState((state) => ({ ...state, open }));
-        }}
-      />
+      <MemberInviteDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
 
       <ConfirmDialog
         open={memberToDelete !== null}

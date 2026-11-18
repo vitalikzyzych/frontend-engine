@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter, type OnUrlUpdateFunction } from 'nuqs/adapters/testing';
 
+import { formats } from '@/i18n/formats';
 import messages from '@/i18n/messages/en.json';
 import { Toaster } from '@/shared/ui/sonner';
 import { TooltipProvider } from '@/shared/ui/tooltip';
@@ -26,9 +27,9 @@ export function renderWithProviders(
 
   function Wrapper({ children }: PropsWithChildren) {
     return (
-      <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
+      <NextIntlClientProvider locale="en" messages={messages} formats={formats} timeZone="UTC">
         <QueryClientProvider client={queryClient}>
-          <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate}>
+          <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate} hasMemory>
             <TooltipProvider>
               {children}
               <Toaster />

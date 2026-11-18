@@ -17,3 +17,15 @@ test('shows the localized not-found page for unknown paths', async ({ page }) =>
   await page.goto('/en/this-page-does-not-exist');
   await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
 });
+
+test('sends security headers with every page', async ({ request }) => {
+  const response = await request.get('/en');
+  const headers = response.headers();
+
+  expect(headers['x-content-type-options']).toBe('nosniff');
+  expect(headers['x-frame-options']).toBe('DENY');
+  expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+  expect(headers['content-security-policy']).toContain("frame-ancestors 'none'");
+  expect(headers['permissions-policy']).toContain('camera=()');
+  expect(headers['strict-transport-security']).toContain('max-age=');
+});

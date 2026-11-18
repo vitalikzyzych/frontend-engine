@@ -2,8 +2,22 @@ import '@testing-library/jest-dom/vitest';
 
 import { cleanup } from '@testing-library/react';
 
-import { membersDb } from '@/features/members/mocks/members.data';
+import { resetMockData } from '@/mocks/handlers';
 import { server } from '@/mocks/server';
+
+// Component tests run without the Next.js router: links become anchors, navigation becomes spies.
+vi.mock('@/i18n/navigation', async () => {
+  const { createElement } = await import('react');
+  const { routerMock } = await import('./utils/router');
+  return {
+    Link: ({ href, ...props }: { href: string } & Record<string, unknown>) =>
+      createElement('a', { href, ...props }),
+    useRouter: () => routerMock,
+    usePathname: () => '/',
+    redirect: vi.fn(),
+    getPathname: ({ href }: { href: string }) => href,
+  };
+});
 
 beforeAll(() => {
   server.listen({ onUnhandledFrame: 'error' });
@@ -12,7 +26,8 @@ beforeAll(() => {
 afterEach(() => {
   cleanup();
   server.resetHandlers();
-  membersDb.reset();
+  resetMockData();
+  vi.clearAllMocks();
 });
 
 afterAll(() => {

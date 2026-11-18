@@ -5,7 +5,7 @@ How a feature or a bug fix goes from idea to pull request, with or without Claud
 ## Feature
 
 1. **Brief.** Copy `docs/features/_template.md` to `docs/features/<name>.md`. Fill in the goal, acceptance criteria, screens, data and out of scope. Each criterion describes something a user can see or do, so one test can check it.
-2. **Design.** Link the Figma frame or add screenshots under `docs/features/<name>/`. Without a design, describe the layout in a few lines and follow the members screen. Agree on the screens before writing tests, because the tests query by visible text and roles.
+2. **Design.** Link the Figma frame or add screenshots under `docs/features/<name>/`; `docs/design.md` describes how a design becomes a screen. Without a design, describe the layout in a few lines and follow the members screens. Agree on the screens before writing tests, because the tests query by visible text and roles.
 3. **Contract and mocks.** Types, MSW handlers and mock data from the Data section. The handlers are the contract until the backend exists, and they let tests and the UI run without it.
 4. **Tests first.** Fill in the Tests section of the brief (which test covers which criterion), then write those tests. Run them and see them fail because the behaviour is missing, not because of a typo.
 5. **Implementation.** Write code until the tests pass. A test is changed only when the test itself is wrong, never to make a failing implementation pass.
@@ -19,8 +19,8 @@ In Claude Code, `/new-feature <name>` runs steps 1 to 7. It stops after the brie
 
 1. Put the source files in `docs/features/<name>/`, for example `docs/features/orders/api.md` (or an OpenAPI `.yaml`/`.json`) and `docs/features/orders/design.html` (or screenshots).
 2. In a fresh session: `/new-feature orders`. Extra context can follow the name, for example `/new-feature orders orders can be cancelled, not deleted`.
-3. Claude reads the files and drafts `docs/features/orders.md`: Data from the API documentation, Screens from the design, acceptance criteria and the Tests section. Differences between the API and the design are listed as open questions. It stops there.
-4. Review the acceptance criteria, Data and Out of scope, correct them, and confirm.
+3. Claude reads the files and drafts `docs/features/orders.md`: Data from the API documentation, Screens from the design, acceptance criteria and the Tests section. Differences between the API and the design, and anything they leave open, go into the brief's Open questions section. It stops there.
+4. Review the acceptance criteria, Data and Out of scope, answer the open questions in the brief, and confirm. Tests are not written while a question is open.
 5. For a larger feature, `/clear` and run `/new-feature orders` again; the brief exists, so it goes straight to mocks, failing tests and implementation. Otherwise continue in the same session.
 6. `pnpm dev` to try it on the mocks, then `/done orders`.
 
@@ -39,11 +39,11 @@ In Claude Code: `/fix-bug <description or ticket>`.
 
 - **Every Claude Code turn with edits:** a Stop hook runs `pnpm check`.
 - **While working:** `pnpm check`.
-- **Every commit:** ESLint and Prettier on staged files, commitlint on the message.
+- **Every commit:** ESLint and Prettier on staged files, a length check on the message.
 - **Before a pull request:** `/done <name>`, or `pnpm verify` and `pnpm e2e` by hand.
 - **Every pull request:** CI runs `pnpm verify` and the end-to-end tests.
 
-The Stop hook skips the check when nothing changed, when only Markdown changed, or when the same changes already passed. When the check fails it sends Claude back to fix it, at most three times in a row, then stops and leaves it to the developer. `SKIP_CLAUDE_CHECK=1` turns it off for a session.
+The Stop hook skips the check when nothing changed, when only Markdown or files under `docs/` changed (briefs, API documentation, design exports), or when the same changes already passed. `pnpm check` never rewrites files under `docs/`, and Prettier ignores the source folders in `docs/features/`. When the check fails it sends Claude back to fix it, at most three times in a row, then stops and leaves it to the developer. `SKIP_CLAUDE_CHECK=1` turns it off for a session.
 
 ## Working with Claude Code efficiently
 

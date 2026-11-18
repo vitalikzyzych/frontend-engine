@@ -1,11 +1,11 @@
 'use client';
 
 import { type ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
+import { EyeIcon, MoreHorizontalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 
+import { Link } from '@/i18n/navigation';
 import { DataTableColumnHeader } from '@/shared/components/data-table/data-table-column-header';
-import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import {
   DropdownMenu,
@@ -16,13 +16,13 @@ import {
 
 import type { Member } from '../types/member';
 import { MemberRoleBadge } from './member-role-badge';
+import { MemberStatusBadge } from './member-status-badge';
 
 interface MembersColumnsOptions {
-  onEdit: (member: Member) => void;
   onDelete: (member: Member) => void;
 }
 
-export function useMembersColumns({ onEdit, onDelete }: MembersColumnsOptions) {
+export function useMembersColumns({ onDelete }: MembersColumnsOptions) {
   const t = useTranslations('members');
   const format = useFormatter();
 
@@ -30,7 +30,14 @@ export function useMembersColumns({ onEdit, onDelete }: MembersColumnsOptions) {
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('columns.name')} />,
-      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+      cell: ({ row }) => (
+        <Link
+          href={`/members/${row.original.id}`}
+          className="font-medium underline-offset-4 hover:underline"
+        >
+          {row.original.name}
+        </Link>
+      ),
     },
     {
       accessorKey: 'email',
@@ -46,18 +53,14 @@ export function useMembersColumns({ onEdit, onDelete }: MembersColumnsOptions) {
       accessorKey: 'status',
       enableSorting: false,
       header: t('columns.status'),
-      cell: ({ row }) => (
-        <Badge variant={row.original.status === 'active' ? 'secondary' : 'outline'}>
-          {t(`statuses.${row.original.status}`)}
-        </Badge>
-      ),
+      cell: ({ row }) => <MemberStatusBadge status={row.original.status} />,
     },
     {
       accessorKey: 'createdAt',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.createdAt')} />
       ),
-      cell: ({ row }) => format.dateTime(new Date(row.original.createdAt), { dateStyle: 'medium' }),
+      cell: ({ row }) => format.dateTime(new Date(row.original.createdAt), 'date'),
     },
     {
       id: 'actions',
@@ -75,8 +78,15 @@ export function useMembersColumns({ onEdit, onDelete }: MembersColumnsOptions) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(row.original)}>
-              <PencilIcon /> {t('edit')}
+            <DropdownMenuItem asChild>
+              <Link href={`/members/${row.original.id}`}>
+                <EyeIcon /> {t('open')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/members/${row.original.id}/edit`}>
+                <PencilIcon /> {t('edit')}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               variant="destructive"

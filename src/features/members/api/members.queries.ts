@@ -22,32 +22,71 @@ export function useMembersList(params: MembersListParams) {
   return useQuery(membersListQueryOptions(params));
 }
 
-function useInvalidateMemberLists() {
+export function useMember(id: string) {
+  return useQuery({
+    queryKey: memberKeys.detail(id),
+    queryFn: ({ signal }) => membersApi.get(id, signal),
+  });
+}
+
+export function useMemberActivity(id: string) {
+  return useQuery({
+    queryKey: memberKeys.activity(id),
+    queryFn: ({ signal }) => membersApi.activity(id, signal),
+  });
+}
+
+/**
+ * Refreshes every list, and the member's detail and activity when an id is given.
+ * Every mutation calls this, so lists and pages never show stale data.
+ */
+function useInvalidateMembers() {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: memberKeys.lists() });
+  return (id?: string) =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: memberKeys.lists() }),
+      id ? queryClient.invalidateQueries({ queryKey: memberKeys.detail(id) }) : undefined,
+    ]);
 }
 
 export function useCreateMember() {
-  const invalidate = useInvalidateMemberLists();
+  const invalidate = useInvalidateMembers();
   return useMutation({
     mutationFn: (input: MemberFormValues) => membersApi.create(input),
-    onSuccess: invalidate,
+    onSuccess: () => invalidate(),
   });
 }
 
 export function useUpdateMember() {
-  const invalidate = useInvalidateMemberLists();
+  const invalidate = useInvalidateMembers();
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: MemberFormValues }) =>
       membersApi.update(id, input),
-    onSuccess: invalidate,
+    onSuccess: (member) => invalidate(member.id),
+  });
+}
+
+/** A status change is an action endpoint, not an edit: `POST /members/:id/deactivate`. */
+export function useDeactivateMember() {
+  const invalidate = useInvalidateMembers();
+  return useMutation({
+    mutationFn: (id: string) => membersApi.deactivate(id),
+    onSuccess: (member) => invalidate(member.id),
+  });
+}
+
+export function useReactivateMember() {
+  const invalidate = useInvalidateMembers();
+  return useMutation({
+    mutationFn: (id: string) => membersApi.reactivate(id),
+    onSuccess: (member) => invalidate(member.id),
   });
 }
 
 export function useDeleteMember() {
-  const invalidate = useInvalidateMemberLists();
+  const invalidate = useInvalidateMembers();
   return useMutation({
     mutationFn: (id: string) => membersApi.remove(id),
-    onSuccess: invalidate,
+    onSuccess: () => invalidate(),
   });
 }

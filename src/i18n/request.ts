@@ -2,6 +2,7 @@ import { locale as rootLocale } from 'next/root-params';
 import { hasLocale, type Messages } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
 
+import { formats } from './formats';
 import { routing } from './routing';
 
 export default getRequestConfig(async ({ locale: explicitLocale }) => {
@@ -12,6 +13,7 @@ export default getRequestConfig(async ({ locale: explicitLocale }) => {
   return {
     locale,
     timeZone: 'UTC',
+    formats,
     messages: messages.default,
   };
 });

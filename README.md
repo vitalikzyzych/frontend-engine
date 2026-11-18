@@ -17,8 +17,8 @@ The engine is frontend only and makes no assumptions about the backend, authenti
 - **Tables**: a generic DataTable on TanStack Table with server-side pagination and sorting
 - **Validated environment**: `src/env.ts`, the build fails on missing or invalid variables
 - **Error tracking**: Sentry, inactive until a DSN is set, removable in five steps
-- **Reference feature**: team members management, the pattern to copy for new features
-- **Quality gates**: ESLint with architecture rules, Prettier, TypeScript, Vitest, Playwright, knip, husky, lint-staged, commitlint, Renovate
+- **Reference feature**: team members management (list with filters, detail page with tabs, dialog and full-page forms, status actions), the pattern to copy for new features
+- **Quality gates**: ESLint with architecture rules, Prettier, TypeScript, Vitest, Playwright, knip, husky, lint-staged, a commit message check, Renovate
 - **CI**: GitHub Actions and Bitbucket Pipelines, both calling the same `pnpm verify`
 - **Hosting**: works on Vercel as is; a Dockerfile with standalone output covers self-hosting
 - **AI**: `CLAUDE.md`, focused skills, `/new-feature`, `/fix-bug` and `/done` commands, a short guide in each feature folder, and a hook that checks the changed code before Claude finishes a turn

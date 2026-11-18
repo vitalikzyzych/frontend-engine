@@ -33,7 +33,10 @@ const changedFiles = [
     ...gitFiles(['diff', '--name-only', '--diff-filter=d', 'HEAD']),
     ...gitFiles(['ls-files', '--others', '--exclude-standard']),
   ]),
-].filter((file) => existsSync(join(ROOT, file)));
+]
+  // docs/ holds briefs and source material (API documentation, design exports) that is never rewritten.
+  .filter((file) => !file.startsWith('docs/'))
+  .filter((file) => existsSync(join(ROOT, file)));
 
 if (changedFiles.length === 0) {
   console.log('pnpm check: no changed files.');

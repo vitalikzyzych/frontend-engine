@@ -27,4 +27,29 @@ test.describe('members', () => {
     await page.reload();
     await expect(page.getByText('1 item')).toBeVisible();
   });
+
+  // Client-side navigation only: the mock data lives in the page and resets on a full reload.
+  test('opens a member, checks activity, deactivates and edits', async ({ page }) => {
+    await page.goto('/en/members/mem_002');
+    await expect(page.getByRole('heading', { name: 'Grace Hopper' })).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Activity' }).click();
+    await expect(page).toHaveURL(/tab=activity/);
+    await expect(page.getByRole('list', { name: 'Activity' })).toContainText('Joined');
+
+    await page.getByRole('button', { name: 'Deactivate' }).click();
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Deactivate' }).click();
+    await expect(page.getByText('Grace Hopper was deactivated')).toBeVisible();
+
+    await page.getByRole('link', { name: 'Edit' }).click();
+    await expect(page).toHaveURL(/\/en\/members\/mem_002\/edit$/);
+    await page.getByLabel('Name').fill('Grace B. Hopper');
+    await page.getByRole('button', { name: 'Save changes' }).click();
+    await expect(page.getByRole('heading', { name: 'Grace B. Hopper' })).toBeVisible();
+
+    await page.getByRole('link', { name: 'Members' }).first().click();
+    await page.getByRole('searchbox').fill('grace.hopper2@');
+    await expect(page.getByRole('row').nth(1)).toContainText('Grace B. Hopper');
+    await expect(page.getByRole('row').nth(1)).toContainText('Deactivated');
+  });
 });

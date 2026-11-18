@@ -25,6 +25,17 @@ describe('MembersView', () => {
     expect(screen.getByText('42 items')).toBeInTheDocument();
   });
 
+  it("links each name to the member's page", async () => {
+    renderWithProviders(<MembersView />);
+    const [firstRow] = await findRows();
+    const name = within(firstRow!).getAllByRole('cell')[0]!.textContent ?? '';
+
+    expect(within(firstRow!).getByRole('link', { name })).toHaveAttribute(
+      'href',
+      expect.stringMatching(/^\/members\/mem_\d+$/) as string,
+    );
+  });
+
   it('reads filters from the URL', async () => {
     renderWithProviders(<MembersView />, { searchParams: { role: 'owner' } });
 
@@ -45,6 +56,47 @@ describe('MembersView', () => {
         expect.objectContaining({ queryString: expect.stringContaining('search=grace') as string }),
       );
     });
+  });
+
+  it('filters by several statuses and writes them to the URL', async () => {
+    const onUrlUpdate = vi.fn();
+    const { user } = renderWithProviders(<MembersView />, { onUrlUpdate });
+    await findRows();
+
+    await user.click(screen.getByRole('button', { name: 'Status' }));
+    await user.click(await screen.findByRole('menuitemcheckbox', { name: 'Invited' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: 'Deactivated' }));
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          queryString: expect.stringContaining('status=invited,deactivated') as string,
+        }),
+      );
+    });
+    expect(await screen.findByText('9 items')).toBeInTheDocument();
+    for (const row of await findRows()) {
+      expect(within(row).getByText(/^(Invited|Deactivated)$/)).toBeInTheDocument();
+    }
+  });
+
+  it('filters by join date range from the URL', async () => {
+    renderWithProviders(<MembersView />, {
+      searchParams: { joinedFrom: '2026-01-05', joinedTo: '2026-01-09' },
+    });
+
+    expect(await findRows()).toHaveLength(5);
+    expect(screen.getByLabelText('Joined from')).toHaveValue('2026-01-05');
+    expect(screen.getByLabelText('Joined to')).toHaveValue('2026-01-09');
+  });
+
+  it('shows a loading state while the list loads', async () => {
+    renderWithProviders(<MembersView />);
+
+    const body = screen.getByRole('table').querySelector('tbody');
+    expect(body).toHaveAttribute('aria-busy', 'true');
+    await findRows();
   });
 
   it('shows an empty state when nothing matches', async () => {
@@ -104,23 +156,18 @@ describe('MembersView', () => {
     expect(await within(dialog).findByText('This email is already a member')).toBeInTheDocument();
   });
 
-  it('edits a member with the current values filled in', async () => {
+  it('links the edit action to the edit page', async () => {
     const { user } = renderWithProviders(<MembersView />);
     const [firstRow] = await findRows();
-    const currentName = within(firstRow!).getAllByRole('cell')[0]!.textContent ?? '';
+    const name = within(firstRow!).getAllByRole('cell')[0]!.textContent ?? '';
+    const memberHref = within(firstRow!).getByRole('link', { name }).getAttribute('href');
 
-    await user.click(within(firstRow!).getByRole('button', { name: `Actions for ${currentName}` }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Edit member' });
-    const nameInput = within(dialog).getByLabelText('Name');
-    expect(nameInput).toHaveValue(currentName);
+    await user.click(within(firstRow!).getByRole('button', { name: `Actions for ${name}` }));
 
-    await user.clear(nameInput);
-    await user.type(nameInput, 'Renamed Person');
-    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
-
-    expect(await screen.findByText('Member updated')).toBeInTheDocument();
-    expect(await screen.findByText('Renamed Person')).toBeInTheDocument();
+    expect(await screen.findByRole('menuitem', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      `${memberHref}/edit`,
+    );
   });
 
   it('removes a member after confirmation', async () => {

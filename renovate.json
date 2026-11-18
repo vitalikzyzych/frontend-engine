@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits", "group:allNonMajor"],
+  "extends": ["config:recommended", "group:allNonMajor"],
   "schedule": ["before 6am on monday"],
   "rangeStrategy": "pin",
   "packageRules": [

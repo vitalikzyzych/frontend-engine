@@ -1,30 +1,40 @@
 # Members feature
 
-Workspace members list with invite, edit and remove. Brief with acceptance criteria: `docs/features/members.md`. Route: `/[locale]/members` (`src/app/[locale]/(app)/members/page.tsx`). Public export: `MembersView` only.
+Workspace members: list with filters, invite dialog, member page with tabs, full-page edit, deactivate and reactivate, remove. Brief with acceptance criteria: `docs/features/members.md`. Routes: `/[locale]/members`, `/[locale]/members/[id]`, `/[locale]/members/[id]/edit` (under `src/app/[locale]/(app)/members/`). Public exports: `MembersView`, `MemberDetailView`, `MemberEditView`.
 
 ## Files
 
-- `types/member.ts`: `Member`, `MEMBER_ROLES`, `MEMBER_SORT_FIELDS`. Adding a role or sort field starts here.
-- `api/members.api.ts`: request functions for `GET/POST /members`, `PATCH/DELETE /members/:id`.
-- `api/members.keys.ts`: query keys. `api/members.queries.ts`: list query and create, update, delete mutations; every mutation invalidates all member lists.
-- `hooks/use-members-search-params.ts`: table state in the URL (page, pageSize, search, role, sort, order) with nuqs.
-- `schemas/member-form.schema.ts`: Zod schema shared by the form and the mock handlers. Messages are `validation` keys.
-- `components/members-view.tsx`: page component. Owns the form dialog state and the delete confirmation.
-- `components/members-columns.tsx`: table columns and the row actions menu.
-- `components/members-toolbar.tsx`: search input and role filter.
-- `components/member-form-dialog.tsx`: one dialog for create and edit (edit when `member` is passed).
-- `components/member-role-badge.tsx`: role badge.
-- `mocks/members.data.ts`: in-memory list of 42 members, reset after each test. `mocks/members.handlers.ts`: filtering, sorting, paging and the 409 duplicate email.
+- `types/member.ts`: `Member`, `MemberActivity`, `MEMBER_ROLES`, `MEMBER_STATUSES`, `MEMBER_SORT_FIELDS`. Adding a role, status or sort field starts here.
+- `api/members.api.ts`: request functions. Translates UI values to the API: status list to `status=a,b`, dates to `YYYY-MM-DD`.
+- `api/members.keys.ts`: query keys. `activity(id)` sits under `detail(id)`.
+- `api/members.queries.ts`: list, detail and activity queries; create, update, deactivate, reactivate, delete mutations. Every mutation invalidates all lists, and the member's detail (with its activity) when it has an id.
+- `hooks/use-members-search-params.ts`: table state in the URL (page, pageSize, search, role, status, joinedFrom, joinedTo, sort, order).
+- `hooks/use-member-tab.ts`: selected tab of the member page (`?tab=activity`).
+- `schemas/member-form.schema.ts`: Zod schema shared by both forms and the mock handlers. Messages are `validation` keys.
+- `components/members-view.tsx`: list page. Owns the invite dialog state and the delete confirmation. Any filter change resets `page` to 1.
+- `components/members-columns.tsx`: columns; the name links to the member page; row menu with Open, Edit (links) and Delete.
+- `components/members-toolbar.tsx`: search, role select, status multi-select (`DataTableFacetedFilter`), join date range (`DateRangeFilter`).
+- `components/member-invite-dialog.tsx`: create form in a dialog.
+- `components/member-detail-view.tsx`: member page: breadcrumbs, header actions, Overview and Activity tabs.
+- `components/member-overview.tsx`, `member-activity-list.tsx`: tab contents. Activity loads only when its tab is open.
+- `components/member-status-actions.tsx`: Deactivate (with confirmation) or Reactivate.
+- `components/member-edit-view.tsx` and `member-edit-form.tsx`: edit page; the form mounts only after the member has loaded.
+- `components/member-form-fields.tsx`: the fields shared by the invite dialog and the edit form.
+- `components/member-not-found.tsx`, `member-page-skeleton.tsx`, `member-role-badge.tsx`, `member-status-badge.tsx`: states and badges.
+- `mocks/members.data.ts`: 42 members and their activity, reset after each test. `mocks/members.handlers.ts`: every endpoint in the brief.
 
 ## How it works
 
-- The URL is the source of truth for the table. Changing search, role or sort resets `page` to 1.
-- The list uses `keepPreviousData`, so the table keeps its rows while the next page loads.
-- Server field errors (`fieldErrors` on `AppError`) are set on matching form fields; a duplicate email returns 409 with `fieldErrors.email = 'emailTaken'`. Any other error shows a toast.
-- Texts are under `members` in `src/i18n/messages/en.json`; the nav label is `nav.members`.
+- The URL is the source of truth for the table and for the selected tab.
+- A 404 on the member page or edit page shows `MemberNotFound` inside the app shell; any other error shows `ErrorState` with retry.
+- Server field errors go through `applyFieldErrors` (`src/shared/lib/forms/`); a duplicate email returns 409 with `fieldErrors.email = 'emailTaken'` on create and on update. Any other error shows a toast.
+- After saving, the edit page navigates to the member page.
+- Texts are under `members` in `src/i18n/messages/en.json`; the nav label is `nav.members`. Dates use the named formats `date` and `dateTime`.
 
 ## Things to know
 
-- The owner cannot be removed: only the UI blocks it (Delete is disabled in `members-columns.tsx`). The mock does not check it.
-- The dashboard links to this page with a card (`src/app/[locale]/(app)/dashboard/page.tsx`).
-- Tests: `components/members-view.test.tsx`, `schemas/member-form.schema.test.ts`, `tests/e2e/members.spec.ts`. Many tests count on the 42 mock members (for example "41 items" after a delete).
+- The owner cannot be removed or deactivated. Remove is blocked only in the UI; deactivate is blocked in the UI and the mock returns 409.
+- Seed data used by tests: `mem_001` Ada Lovelace (owner), `mem_002` Grace Hopper (active member), `mem_006` deactivated with three events. Status counts: 33 active, 6 invited, 3 deactivated.
+- Many tests count on the 42 mock members (for example "41 items" after a delete).
+- The dashboard links to the list with a card (`src/app/[locale]/(app)/dashboard/page.tsx`).
+- Tests: `components/members-view.test.tsx`, `member-detail-view.test.tsx`, `member-edit-view.test.tsx`, `schemas/member-form.schema.test.ts`, `tests/e2e/members.spec.ts`.

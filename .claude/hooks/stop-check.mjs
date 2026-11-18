@@ -2,7 +2,8 @@
 /**
  * Claude Code Stop hook: runs `pnpm check` before Claude finishes a turn.
  *
- * - Nothing changed since the last commit, or only Markdown changed: no check.
+ * - Nothing changed since the last commit, or only Markdown and files under docs/ changed
+ *   (briefs, API documentation, design exports): no check.
  * - The same changes already passed: no check (the result is cached by content).
  * - The check fails: Claude is sent back to fix it, at most three times in a row,
  *   so a problem Claude cannot fix does not loop forever.
@@ -39,7 +40,8 @@ const listUntracked = () =>
 const changed = [...git(['diff', '--name-only', 'HEAD']).split('\n'), ...listUntracked()].filter(
   Boolean,
 );
-if (changed.every((file) => file.endsWith('.md'))) process.exit(0);
+const isDocumentation = (file) => file.endsWith('.md') || file.startsWith('docs/');
+if (changed.every(isDocumentation)) process.exit(0);
 
 /** Fingerprint of the working tree: the diff against HEAD plus every untracked file. */
 function treeSignature() {

@@ -9,6 +9,7 @@ Read `docs/architecture.md` before structural changes. The members feature (`src
 Full process in `docs/workflow.md`. In short:
 
 - **Feature:** brief in `docs/features/<name>.md` with acceptance criteria, design and a Tests section, confirmed before any code. Then types and MSW mocks, then failing tests, then implementation. `/new-feature <name>`.
+- **Design:** `docs/design.md`: brand goes into `tokens.css` once, screens are built from existing components, markup is never copied.
 - **Bug:** a test that reproduces it and fails first, then the fix. `/fix-bug <description>`.
 - **Finish:** `/done <name>` runs `pnpm verify`, `pnpm e2e` and the AC coverage check (`qa` agent), then writes the feature guide.
 - **Feature guide:** each feature has `src/features/<name>/CLAUDE.md` (files, data flow, non-obvious rules). Read it before changing a feature instead of reading every file; update it when the change makes it wrong.
@@ -29,6 +30,7 @@ Full process in `docs/workflow.md`. In short:
 - Use `pnpm check` and single test files while working; read only the failing part of long output.
 - For broad searches across the codebase, use the Explore agent.
 - Keep replies short: what changed, what failed, what needs a decision.
+- A reply that finishes work which changed files ends with a suggested commit message in a code block, as the last line. One line, 10 to 100 characters (the commit-msg hook checks this), ideally under 72, starting with a verb: "Add member detail page with tabs". No prefix such as `feat:`, no contractions. The same text works as the pull request title, which becomes the commit on `main` after the squash merge. Only a suggestion: never commit.
 
 ## Rules enforced by lint (they fail CI)
 

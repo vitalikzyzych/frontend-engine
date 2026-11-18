@@ -77,7 +77,8 @@
     },
     "statuses": {
       "active": "Active",
-      "invited": "Invited"
+      "invited": "Invited",
+      "deactivated": "Deactivated"
     },
     "columns": {
       "name": "Name",
@@ -97,12 +98,10 @@
     "emptyTitle": "No members yet",
     "emptyDescription": "Invite your first team member to get started.",
     "emptyFilteredTitle": "No matching members",
-    "emptyFilteredDescription": "Try a different search or role filter.",
+    "emptyFilteredDescription": "Try a different search or filter.",
     "form": {
       "createTitle": "Invite member",
       "createDescription": "They will receive an invitation by email.",
-      "editTitle": "Edit member",
-      "editDescription": "Update the member's details and role.",
       "name": "Name",
       "email": "Email",
       "role": "Role",
@@ -112,6 +111,45 @@
       "created": "Invitation sent",
       "updated": "Member updated",
       "saveFailed": "Could not save the member"
+    },
+    "filterByStatus": "Status",
+    "joinedFrom": "Joined from",
+    "joinedTo": "Joined to",
+    "open": "Open",
+    "detail": {
+      "title": "Member",
+      "tabs": {
+        "overview": "Overview",
+        "activity": "Activity"
+      },
+      "fields": {
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "joined": "Joined"
+      },
+      "activityEmpty": "No activity yet",
+      "notFoundTitle": "Member not found",
+      "notFoundDescription": "This member does not exist or was removed.",
+      "backToList": "Back to members",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "deactivateTitle": "Deactivate member?",
+      "deactivateDescription": "{name} will lose access until they are reactivated.",
+      "deactivated": "{name} was deactivated",
+      "reactivated": "{name} was reactivated",
+      "statusChangeFailed": "Could not change the member's status"
+    },
+    "activity": {
+      "invited": "Invited",
+      "joined": "Joined",
+      "updated": "Details updated",
+      "deactivated": "Deactivated",
+      "reactivated": "Reactivated"
+    },
+    "editPage": {
+      "title": "Edit member",
+      "description": "Update the member's details and role."
     }
   }
 }

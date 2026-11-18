@@ -18,6 +18,8 @@ export default defineConfig({
     css: false,
     coverage: {
       provider: 'v8',
+      // A short summary in the terminal; the full report is in coverage/index.html.
+      reporter: ['text-summary', 'html'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/shared/ui/**', 'src/**/*.test.{ts,tsx}', 'src/mocks/**'],
       thresholds: {

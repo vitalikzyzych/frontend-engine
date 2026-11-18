@@ -43,4 +43,12 @@ Steps after `pnpm create-app <dir>`, in order.
 
 - [ ] Write the brief in `docs/features/`.
 - [ ] Build it from the members pattern (`/new-feature <name>` in Claude Code).
-- [ ] Delete the members feature: `src/features/members/`, its route, its navigation entry, its handlers in `src/mocks/handlers.ts`, its messages, `tests/e2e/members.spec.ts` and `docs/features/members.md`.
+- [ ] Delete the members feature once the first feature exists. Keep it until then, it is the reference.
+  - `src/features/members/` and `docs/features/members.md`
+  - the routes in `src/app/[locale]/(app)/members/`
+  - the navigation entry and the `'/members'` value of `NavItem.href` in `src/shared/config/navigation.ts`
+  - the members card in `src/app/[locale]/(app)/dashboard/page.tsx` and its `dashboard.members*` messages
+  - `members` and `nav.members` in every messages file
+  - its handlers and its mock store in `src/mocks/handlers.ts`
+  - `tests/e2e/members.spec.ts`, and the step that clicks Members in `tests/e2e/navigation.spec.ts`
+  - Run `pnpm verify` and `pnpm e2e`; knip reports shared components no feature uses any more. Keep them if the application will need them.

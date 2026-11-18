@@ -23,7 +23,7 @@
     "e2e:install": "playwright install --with-deps chromium",
     "knip": "knip",
     "check": "node scripts/check.mjs",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm knip && pnpm build",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:coverage && pnpm knip && pnpm build",
     "engine:check": "node scripts/check-engine.mjs",
     "create-app": "node scripts/create-app.mjs",
     "prepare": "husky && next typegen"
@@ -33,6 +33,7 @@
     "@sentry/nextjs": "11.12.0",
     "@t3-oss/env-nextjs": "0.13.11",
     "@tanstack/react-query": "5.107.1",
+    "@tanstack/react-query-devtools": "5.107.1",
     "@tanstack/react-table": "8.21.3",
     "class-variance-authority": "0.7.1",
     "cn": "0.5.2",
@@ -49,13 +50,10 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
-    "@commitlint/cli": "21.2.4",
-    "@commitlint/config-conventional": "21.2.4",
     "@ianvs/prettier-plugin-sort-imports": "4.7.1",
     "@playwright/test": "1.65.0",
     "@tailwindcss/postcss": "4.3.5",
     "@tanstack/eslint-plugin-query": "5.107.1",
-    "@tanstack/react-query-devtools": "5.107.1",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",

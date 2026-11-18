@@ -28,6 +28,12 @@ Written before the implementation. One line per AC: the level and what the test 
 - AC-1: component, `<name>-view.test.tsx`: ...
 - AC-2: e2e, `tests/e2e/<name>.spec.ts`: ...
 
+## Open questions
+
+Differences between the API documentation and the design, and anything either one leaves open. Each question is answered in the brief or moved to Out of scope before tests are written; this section is empty when the brief is confirmed.
+
+- ...
+
 ## Out of scope
 
 What this feature deliberately does not do.

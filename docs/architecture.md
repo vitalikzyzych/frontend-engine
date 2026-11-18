@@ -17,13 +17,15 @@ src/
     index.ts                 public API: the only file other code may import
   shared/
     ui/                      shadcn components (generated with the shadcn CLI)
-    components/              app-wide components: AppShell, DataTable, PageHeader, EmptyState, ErrorState, ConfirmDialog
+    components/              app-wide components: AppShell, PageHeader, PageBreadcrumbs, DataTable and its
+                             filters, DateRangeFilter, EmptyState, ErrorState, ConfirmDialog
     hooks/                   generic hooks
     lib/http/                fetch client and AppError
+    lib/forms/               form helpers such as applyFieldErrors
     lib/query/               QueryClient defaults
     config/                  navigation and other app-wide configuration
     types/                   shared types such as Paginated<T>
-  i18n/                      routing, navigation helpers, request config, messages
+  i18n/                      routing, navigation helpers, request config, named formats, messages
   providers/                 client providers: theme, query, URL state, tooltips, toasts, mocks
   mocks/                     MSW setup that combines the handlers of all features
   observability/             Sentry (removable)
@@ -72,9 +74,9 @@ There is no global store. Adding one needs a concrete case that the options abov
 
 The pattern, as used in `src/features/members/api/`:
 
-1. `members.api.ts`: plain request functions built on `http` from `@/shared/lib/http/http-client`.
-2. `members.keys.ts`: one query key factory per feature, so invalidation is predictable.
-3. `members.queries.ts`: `useQuery` and `useMutation` hooks. Mutations invalidate the lists they affect.
+1. `members.api.ts`: plain request functions built on `http` from `@/shared/lib/http/http-client`. This is the only place that knows the API's shapes; differences from the engine's shared types are mapped here, not in `shared/`.
+2. `members.keys.ts`: one query key factory per feature (`lists`, `list`, `details`, `detail`), so invalidation is predictable. Data that belongs to one record sits under its `detail` key.
+3. `members.queries.ts`: `useQuery` and `useMutation` hooks. Mutations invalidate the lists and the detail they affect. Status changes are action endpoints (`POST /members/:id/deactivate`) with their own hook.
 4. Components use these hooks, never `http` or `fetch` directly.
 
 `http` sends JSON, includes credentials, and turns every failure into an `AppError` with `status`, `code` and `fieldErrors`. Passing a Zod `schema` validates the response at runtime. `AppError.fromResponse` is the single place to adapt when a backend uses a different error format.
@@ -83,7 +85,7 @@ Retries: queries retry server and network errors twice and never retry 4xx respo
 
 ## Mocks
 
-Every feature ships MSW handlers in `features/<name>/mocks/`, registered in `src/mocks/handlers.ts`. They serve three purposes:
+Every feature ships MSW handlers in `features/<name>/mocks/`, registered in `src/mocks/handlers.ts`. A feature whose handlers keep data in memory also registers its store there (`mockStores`), so tests reset it after each test. The handlers serve three purposes:
 
 - development without a backend (`NEXT_PUBLIC_API_MOCKING=enabled`)
 - component tests (`tests/setup.ts` starts the MSW server)
@@ -93,13 +95,15 @@ In mock mode the app waits in the browser until the mock worker has started, so 
 
 ## Forms
 
-React Hook Form with `zodResolver`. Zod error messages are keys of the `validation` namespace in the messages file, so the same schema works in every language. Field errors returned by the server (`AppError.fieldErrors`) are set on the matching fields; other failures show a toast. See `member-form-dialog.tsx`.
+React Hook Form with `zodResolver`. Zod error messages are keys of the `validation` namespace in the messages file, so the same schema works in every language. Field errors returned by the server (`AppError.fieldErrors`) are set on the matching fields with `applyFieldErrors`; other failures show a toast.
+
+Small create forms open in a dialog (`member-invite-dialog.tsx`). Editing and larger forms have their own page (`member-edit-view.tsx`). Both use one shared fields component.
 
 ## Translations
 
 - Messages live in `src/i18n/messages/<locale>.json`. Keys are typed: a missing key is a TypeScript error.
 - A test fails when a locale file is missing keys that the default locale has.
-- Dates and numbers are formatted with `useFormatter` from next-intl. The time zone is set in `src/i18n/request.ts`.
+- Dates and numbers are formatted with `useFormatter` from next-intl and the named formats in `src/i18n/formats.ts` (`format.dateTime(date, 'date')`). Currency is passed inline because the currency code comes with the data. The time zone is set in `src/i18n/request.ts`.
 - Adding a locale: add it to `src/i18n/routing.ts`, add the messages file, add its name under `locale` in every messages file. The language switcher appears automatically once there are two locales.
 
 ## Errors and loading
@@ -109,9 +113,15 @@ React Hook Form with `zodResolver`. Zod error messages are keys of the `validati
 - `app/[locale]/not-found.tsx` is the localized 404 page; `[...rest]` sends unknown paths to it.
 - `app/[locale]/(app)/loading.tsx` shows a skeleton during navigation.
 - Inside pages, `ErrorState`, `EmptyState` and the DataTable skeleton cover request states.
+- A record that does not exist (404 from the API) shows the feature's not-found state inside the app shell, with a link back to the list. `notFound()` is used only for routes that do not exist, not for API data, because in mock mode pages render in the browser.
 
 ## Styling
 
 - Brand colors and radius live in `src/styles/tokens.css`. That is the only file to edit when an application gets its own look.
 - New shadcn components: `pnpm dlx shadcn@latest add <component>`. They land in `src/shared/ui/`.
 - Class names are merged with `cn` and sorted by the Prettier Tailwind plugin.
+- How a design file becomes a screen: `docs/design.md`.
+
+## Security headers
+
+`next.config.ts` sends `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` and a Content-Security-Policy with only `frame-ancestors 'none'`. A full Content-Security-Policy depends on each application's backend, analytics and error tracking, so it is added per application.

@@ -5,3 +5,6 @@ playwright-report/
 test-results/
 public/mockServiceWorker.js
 src/shared/ui/
+
+# Source material for features (API documentation, design exports). Briefs (docs/features/*.md) stay formatted.
+docs/features/*/

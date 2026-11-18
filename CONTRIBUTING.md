@@ -13,7 +13,7 @@
 
 - Trunk-based: short branches from `main`, merged within one to three days.
 - Branch names: `feat/<feature>-<topic>`, `fix/<topic>`, `chore/<topic>`.
-- Commit messages follow conventional commits (`feat: ...`, `fix: ...`, `chore: ...`). commitlint checks this on every commit.
+- Commit messages have no required format. The first line says what changed, in 10 to 100 characters; a hook checks this on every commit. Pull requests are squash merged, so the pull request title becomes the commit message on `main`: write it the same way.
 - Large features are split into several pull requests. Unfinished screens stay unlinked from navigation until they are complete.
 
 ## Working in parallel
@@ -27,7 +27,7 @@
 ## Checks
 
 - While working: `pnpm check` (changed files, types, related tests). Claude Code runs it automatically before finishing a turn.
-- On commit: ESLint with `--fix` and Prettier on staged files, commitlint on the message.
+- On commit: ESLint with `--fix` and Prettier on staged files, a length check on the message.
 - Before opening a pull request: `pnpm verify` and `pnpm e2e`, or `/done <name>` in Claude Code.
 - In CI: `pnpm verify` and the Playwright tests.
 
