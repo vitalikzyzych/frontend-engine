@@ -21,7 +21,7 @@ The engine is frontend only and makes no assumptions about the backend, authenti
 - **Quality gates**: ESLint with architecture rules, Prettier, TypeScript, Vitest, Playwright, knip, husky, lint-staged, commitlint, Renovate
 - **CI**: GitHub Actions and Bitbucket Pipelines, both calling the same `pnpm verify`
 - **Hosting**: works on Vercel as is; a Dockerfile with standalone output covers self-hosting
-- **AI**: `CLAUDE.md`, focused skills, `/new-feature`, `/fix-bug` and `/done` commands, and a hook that checks the changed code before Claude finishes a turn
+- **AI**: `CLAUDE.md`, focused skills, `/new-feature`, `/fix-bug` and `/done` commands, a short guide in each feature folder, and a hook that checks the changed code before Claude finishes a turn
 
 ## Requirements
 

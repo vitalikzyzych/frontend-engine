@@ -10,7 +10,8 @@ Full process in `docs/workflow.md`. In short:
 
 - **Feature:** brief in `docs/features/<name>.md` with acceptance criteria, design and a Tests section, confirmed before any code. Then types and MSW mocks, then failing tests, then implementation. `/new-feature <name>`.
 - **Bug:** a test that reproduces it and fails first, then the fix. `/fix-bug <description>`.
-- **Finish:** `/done <name>` runs `pnpm verify`, `pnpm e2e` and the AC coverage check (`qa` agent).
+- **Finish:** `/done <name>` runs `pnpm verify`, `pnpm e2e` and the AC coverage check (`qa` agent), then writes the feature guide.
+- **Feature guide:** each feature has `src/features/<name>/CLAUDE.md` (files, data flow, non-obvious rules). Read it before changing a feature instead of reading every file; update it when the change makes it wrong.
 - Tests are written before the code they test. Never weaken or delete a test to make it pass; if a test is wrong, fix it and say why.
 - A brief that is unclear or contradicts the code: stop and ask, do not guess scope.
 

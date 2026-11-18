@@ -10,7 +10,7 @@ How a feature or a bug fix goes from idea to pull request, with or without Claud
 4. **Tests first.** Fill in the Tests section of the brief (which test covers which criterion), then write those tests. Run them and see them fail because the behaviour is missing, not because of a typo.
 5. **Implementation.** Write code until the tests pass. A test is changed only when the test itself is wrong, never to make a failing implementation pass.
 6. **Check while working.** `pnpm check` runs Prettier and ESLint on the changed files, the type check, and the tests related to the changes. In Claude Code it runs automatically before Claude finishes a turn.
-7. **Done.** `/done <name>` in Claude Code, or by hand: `pnpm verify`, `pnpm e2e`, and a read of the brief against the tests. Every criterion needs a test that would fail if the behaviour broke.
+7. **Done.** `/done <name>` in Claude Code, or by hand: `pnpm verify`, `pnpm e2e`, and a read of the brief against the tests. Every criterion needs a test that would fail if the behaviour broke. The last step writes `src/features/<name>/CLAUDE.md`, a short guide to the feature: its files, how data and state flow, and the rules that are not obvious from the code. Later changes and bug fixes start from that guide instead of reading every file, and update it when they make it wrong. `src/features/members/CLAUDE.md` is the example.
 8. **Pull request** with the template, reviewed by the other developer.
 
 In Claude Code, `/new-feature <name>` runs steps 1 to 7. It stops after the brief for confirmation of the acceptance criteria and the design.

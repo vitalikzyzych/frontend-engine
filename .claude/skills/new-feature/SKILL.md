@@ -28,3 +28,4 @@ Copy the shape of `src/features/members/`. Order matters: brief, contract, tests
    - navigation entry in `src/shared/config/navigation.ts`, label under `nav` in the messages
    - all texts under a `<name>` namespace in `src/i18n/messages/en.json` (and every other locale file)
 5. **Check.** `pnpm check` while working; `/done <name>` at the end (runs `pnpm verify`, `pnpm e2e` and the AC coverage check).
+6. **Feature guide.** `/done` writes `src/features/<name>/CLAUDE.md` in the shape of `src/features/members/CLAUDE.md`: files, data flow, non-obvious rules, under 50 lines.

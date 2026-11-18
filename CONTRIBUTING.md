@@ -44,5 +44,6 @@
 - `pnpm verify` and Playwright pass.
 - Loading, empty and error states are handled.
 - All text is translated, no hardcoded strings.
+- The feature guide `src/features/<name>/CLAUDE.md` matches the code.
 - MSW handlers and tests are added or updated.
 - Reviewed and approved.
