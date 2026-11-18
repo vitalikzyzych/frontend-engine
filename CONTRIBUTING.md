@@ -7,7 +7,7 @@
 3. `pnpm install` (also installs the git hooks).
 4. `cp .env.example .env.local`.
 5. `pnpm dev`. With `NEXT_PUBLIC_API_MOCKING=enabled` the app runs on MSW mocks, no backend needed.
-6. Read [docs/architecture.md](docs/architecture.md) and the members feature in `src/features/members/`.
+6. Read [docs/workflow.md](docs/workflow.md), [docs/architecture.md](docs/architecture.md) and the members feature in `src/features/members/`.
 
 ## Branches and commits
 
@@ -20,13 +20,15 @@
 
 - Each feature folder has one owner during a sprint, so two people rarely edit the same files.
 - Changes to `src/shared/` go in small separate pull requests, since they affect everyone.
-- A new feature starts with a short brief in `docs/features/<name>.md` (copy `_template.md`).
-- `/new-feature <name>` in Claude Code creates the feature folder from the members pattern.
+- A new feature starts with a short brief in `docs/features/<name>.md` (copy `_template.md`), confirmed before code is written.
+- Tests come before the implementation, for features and for bug fixes. The steps are in [docs/workflow.md](docs/workflow.md).
+- In Claude Code: `/new-feature <name>`, `/fix-bug <description>` and `/done <name>`.
 
 ## Checks
 
+- While working: `pnpm check` (changed files, types, related tests). Claude Code runs it automatically before finishing a turn.
 - On commit: ESLint with `--fix` and Prettier on staged files, commitlint on the message.
-- Before opening a pull request: `pnpm verify`.
+- Before opening a pull request: `pnpm verify` and `pnpm e2e`, or `/done <name>` in Claude Code.
 - In CI: `pnpm verify` and the Playwright tests.
 
 ## Pull requests
@@ -37,7 +39,8 @@
 
 ## Definition of done
 
-- Acceptance criteria in the brief are met.
+- Acceptance criteria in the brief are met, and each one is covered by a test listed in the brief.
+- Bug fixes include a test that failed before the fix.
 - `pnpm verify` and Playwright pass.
 - Loading, empty and error states are handled.
 - All text is translated, no hardcoded strings.

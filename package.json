@@ -22,6 +22,7 @@
     "e2e": "playwright test",
     "e2e:install": "playwright install --with-deps chromium",
     "knip": "knip",
+    "check": "node scripts/check.mjs",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm knip && pnpm build",
     "engine:check": "node scripts/check-engine.mjs",
     "create-app": "node scripts/create-app.mjs",

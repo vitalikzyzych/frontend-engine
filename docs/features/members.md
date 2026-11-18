@@ -26,6 +26,16 @@ Workspace admins see who has access, invite new people, change roles and remove 
 - `PATCH /members/:id` with `{ name, email, role }` returns the member
 - `DELETE /members/:id` returns 204
 
+## Tests
+
+- AC-1: component, `members-view.test.tsx`: "shows the first page of members"
+- AC-2: component, "reads filters from the URL", "searches members and writes the search to the URL"; e2e, "keeps table state in the URL after a reload"
+- AC-3: schema, `member-form.schema.test.ts`; component, "invites a member and refreshes the list", "shows validation errors from the schema", "maps server field errors onto the form"
+- AC-4: component, "edits a member with the current values filled in"
+- AC-5: component, "removes a member after confirmation", "does not allow removing the owner"
+- AC-6: component, "shows an empty state when nothing matches", "shows an error state with retry when the request fails"
+- Main flow: e2e, `tests/e2e/members.spec.ts`: "lists, filters and invites members"
+
 ## Out of scope
 
 Invitation emails, permissions, bulk actions.

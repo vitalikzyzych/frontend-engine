@@ -21,7 +21,7 @@ The engine is frontend only and makes no assumptions about the backend, authenti
 - **Quality gates**: ESLint with architecture rules, Prettier, TypeScript, Vitest, Playwright, knip, husky, lint-staged, commitlint, Renovate
 - **CI**: GitHub Actions and Bitbucket Pipelines, both calling the same `pnpm verify`
 - **Hosting**: works on Vercel as is; a Dockerfile with standalone output covers self-hosting
-- **AI**: `CLAUDE.md`, focused skills and a `/new-feature` command for Claude Code
+- **AI**: `CLAUDE.md`, focused skills, `/new-feature`, `/fix-bug` and `/done` commands, and a hook that checks the changed code before Claude finishes a turn
 
 ## Requirements
 
@@ -55,6 +55,7 @@ pnpm dev            # http://localhost:3000, runs on MSW mocks
 | ------------------------------------------------------ | -------------------------------------------------------------------------- |
 | `pnpm dev`                                             | Development server                                                         |
 | `pnpm build` / `pnpm start`                            | Production build and server                                                |
+| `pnpm check`                                           | Fast check of changed files: format, lint, types, related tests            |
 | `pnpm verify`                                          | Every quality gate: format, lint, types, tests, knip, build                |
 | `pnpm lint` / `pnpm lint:fix`                          | ESLint, including architecture rules                                       |
 | `pnpm format`                                          | Prettier                                                                   |
@@ -67,6 +68,7 @@ pnpm dev            # http://localhost:3000, runs on MSW mocks
 
 ## Documentation
 
+- [docs/workflow.md](docs/workflow.md): how a feature or bug fix goes from brief to pull request, tests first, and working with Claude Code
 - [docs/architecture.md](docs/architecture.md): folder structure, import rules, data fetching, state, forms, translations, errors
 - [CONTRIBUTING.md](CONTRIBUTING.md): workflow for the team, branches, reviews, definition of done
 - [docs/new-app-checklist.md](docs/new-app-checklist.md): steps when an application starts

@@ -103,4 +103,50 @@ describe('MembersView', () => {
 
     expect(await within(dialog).findByText('This email is already a member')).toBeInTheDocument();
   });
+
+  it('edits a member with the current values filled in', async () => {
+    const { user } = renderWithProviders(<MembersView />);
+    const [firstRow] = await findRows();
+    const currentName = within(firstRow!).getAllByRole('cell')[0]!.textContent ?? '';
+
+    await user.click(within(firstRow!).getByRole('button', { name: `Actions for ${currentName}` }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Edit member' });
+    const nameInput = within(dialog).getByLabelText('Name');
+    expect(nameInput).toHaveValue(currentName);
+
+    await user.clear(nameInput);
+    await user.type(nameInput, 'Renamed Person');
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(await screen.findByText('Member updated')).toBeInTheDocument();
+    expect(await screen.findByText('Renamed Person')).toBeInTheDocument();
+  });
+
+  it('removes a member after confirmation', async () => {
+    const { user } = renderWithProviders(<MembersView />);
+    const [firstRow] = await findRows();
+    const name = within(firstRow!).getAllByRole('cell')[0]!.textContent ?? '';
+
+    await user.click(within(firstRow!).getByRole('button', { name: `Actions for ${name}` }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    const confirm = await screen.findByRole('alertdialog', { name: 'Remove member?' });
+    await user.click(within(confirm).getByRole('button', { name: 'Delete' }));
+
+    expect(await screen.findByText(`${name} was removed`)).toBeInTheDocument();
+    expect(await screen.findByText('41 items')).toBeInTheDocument();
+  });
+
+  it('does not allow removing the owner', async () => {
+    const { user } = renderWithProviders(<MembersView />, { searchParams: { role: 'owner' } });
+    const [ownerRow] = await findRows();
+    const name = within(ownerRow!).getAllByRole('cell')[0]!.textContent ?? '';
+
+    await user.click(within(ownerRow!).getByRole('button', { name: `Actions for ${name}` }));
+
+    expect(await screen.findByRole('menuitem', { name: 'Delete' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
 });

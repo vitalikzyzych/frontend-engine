@@ -133,7 +133,7 @@ When an application starts, `shared/lib/http` is connected to its backend: base 
 
 **Repository rules (set up per application, on any host):** `main` protected, merges only through pull requests, one approval and green CI required, squash merge, pull request template with feature name, screenshots and checklist. Renovate opens grouped dependency updates weekly.
 
-**Engine CI:** the engine repository has its own job that creates a fresh application with the create script and runs `pnpm verify` and Playwright on it, so a broken engine is caught before an application starts.
+**Engine CI:** the engine repository has its own job that creates a fresh application with the create script and runs `pnpm verify` on it, so a broken engine is caught before an application starts. Playwright runs on the engine itself in the end-to-end job; the fresh application is an identical copy.
 
 ## 6. Reference feature
 
@@ -179,14 +179,17 @@ New features are built by copying its shape, which keeps code consistent between
 
 - One `CLAUDE.md`, under 150 lines, describing the code as it actually is.
 - A few focused skills: new feature, data fetching, forms, UI, translations, testing. Claude Code only, so there is one copy of the guidance and nothing to keep in sync.
-- Project command `/new-feature <name>` creates the feature folder, MSW handlers and brief from the reference feature.
+- Tests first: a feature is built from its brief in the order acceptance criteria, contract and mocks, failing tests, implementation. A bug fix starts with a failing test. The steps are in `docs/workflow.md`.
+- Project commands: `/new-feature <name>` (brief, tests, code), `/fix-bug <description>` (failing test, fix) and `/done <name>` (all gates, end-to-end tests, and a read-only `qa` agent that checks every acceptance criterion against the tests).
+- A Stop hook runs `pnpm check` (changed files, types, related tests) before Claude finishes a turn, so the check does not depend on Claude remembering it. It skips unchanged work and gives up after three failed attempts.
+- Token use is kept low through short sessions per task with the brief as the handoff, the fast check instead of full builds while working, and rules in lint rather than in text.
 - Rules that matter are enforced by lint, not only described in text.
 
 ## 9. Reused from mvp-engine and dropped
 
 Reused: the design token approach in `tokens.css`, the shadcn setup, EmptyState, LoadingState and ErrorBoundary, the boolean naming rule, parts of the guardrails text, the feature brief idea.
 
-Dropped: Redux and RTK Query, presets, the step-by-step generator, the upgrade command, the spec status CI gate, the three copies of the AI guidance, custom lint rules that existing plugins already cover, auth and backend-specific code.
+Dropped: Redux and RTK Query, presets, the step-by-step generator, the upgrade command, the spec status CI gate and the multi-stage agent pipeline (its test-first loop and AC coverage check are kept in a lighter form, see section 8), the three copies of the AI guidance, custom lint rules that existing plugins already cover, auth and backend-specific code.
 
 ## 10. Build phases
 

@@ -4,12 +4,30 @@ Next.js 16 App Router SaaS frontend. TypeScript strict, Tailwind 4, shadcn/ui, T
 
 Read `docs/architecture.md` before structural changes. The members feature (`src/features/members/`) is the reference implementation: new features copy its shape.
 
+## Workflow
+
+Full process in `docs/workflow.md`. In short:
+
+- **Feature:** brief in `docs/features/<name>.md` with acceptance criteria, design and a Tests section, confirmed before any code. Then types and MSW mocks, then failing tests, then implementation. `/new-feature <name>`.
+- **Bug:** a test that reproduces it and fails first, then the fix. `/fix-bug <description>`.
+- **Finish:** `/done <name>` runs `pnpm verify`, `pnpm e2e` and the AC coverage check (`qa` agent).
+- Tests are written before the code they test. Never weaken or delete a test to make it pass; if a test is wrong, fix it and say why.
+- A brief that is unclear or contradicts the code: stop and ask, do not guess scope.
+
 ## Commands
 
 - `pnpm dev`: development server on mocks
-- `pnpm verify`: all gates (format, lint, typecheck, tests, knip, build). Run before saying work is done.
+- `pnpm check`: fast check of changed files (format, lint, types, related tests). Runs automatically before you finish a turn (Stop hook); fix what it reports.
+- `pnpm verify`: all gates (format, lint, typecheck, tests, knip, build). Slow: run once at the end, not after every change.
+- `pnpm test <path>`: one file or folder. `pnpm e2e`: Playwright (builds the app).
 - `pnpm lint:fix`, `pnpm format`: fix lint and formatting
-- `pnpm test`, `pnpm e2e`: Vitest, Playwright
+
+## Working efficiently
+
+- Read only the files the task needs. The members feature and the skills answer most "how is this done here" questions.
+- Use `pnpm check` and single test files while working; read only the failing part of long output.
+- For broad searches across the codebase, use the Explore agent.
+- Keep replies short: what changed, what failed, what needs a decision.
 
 ## Rules enforced by lint (they fail CI)
 
@@ -37,7 +55,7 @@ Read `docs/architecture.md` before structural changes. The members feature (`src
 ## Tests
 
 - Component tests next to the file (`*.test.tsx`), rendered with `renderWithProviders` from `@tests/utils/render`. Network goes through MSW; override handlers with `server.use(...)`.
-- Query by role and visible text, as a user would.
+- Query by role and visible text, as a user would. Test names describe behaviour; the brief maps them to ACs.
 - One Playwright flow per feature in `tests/e2e/`.
 
 ## Skills

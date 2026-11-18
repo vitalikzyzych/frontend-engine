@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(pnpm dev:*)",
+      "Bash(pnpm check:*)",
       "Bash(pnpm verify:*)",
       "Bash(pnpm lint:*)",
       "Bash(pnpm format:*)",
@@ -12,10 +13,24 @@
       "Bash(pnpm build:*)",
       "Bash(pnpm exec prettier:*)",
       "Bash(pnpm exec eslint:*)",
+      "Bash(pnpm exec vitest:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)"
     ],
     "ask": ["Bash(git commit:*)", "Bash(git push:*)", "Bash(git merge:*)", "Bash(pnpm add:*)"]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop-check.mjs\"",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
   }
 }
